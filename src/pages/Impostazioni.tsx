@@ -1,380 +1,294 @@
-import { useState } from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuthStore } from '@/stores/authStore'
-import { Card, Button } from '@/components/ui'
 import { Moon, Sun, Globe, Lock, Bell, Shield, LogOut, Save, Eye, EyeOff, Check, AlertCircle } from 'lucide-react'
-import { Switch } from '@/components/ui/switch'
 
+const neu = {
+  outset:  `5px 5px 14px var(--neu-dark), -3px -3px 9px var(--neu-light)`,
+  inset:   `inset 3px 3px 8px var(--neu-dark), inset -2px -2px 5px var(--neu-light)`,
+  insetSm: `inset 2px 2px 5px var(--neu-dark), inset -1px -1px 3px var(--neu-light)`,
+  panel:   `8px 8px 20px var(--neu-dark), -5px -5px 14px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.2)`,
+}
+const glass: React.CSSProperties = {
+  background: 'var(--glass-bg)',
+  border: '1px solid var(--glass-border)',
+  backdropFilter: 'blur(24px) saturate(1.5)',
+  WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+}
+
+/* ── componenti base ── */
+function Section({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ ...glass, borderRadius: 24, padding: '28px 26px', boxShadow: neu.panel }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: '1px solid var(--glass-border)' }}>
+        <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', flexShrink: 0 }}>
+          <Icon size={15} />
+        </div>
+        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text)' }}>{title}</span>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function InfoRow({ label, value, badge }: { label: string; value?: string; badge?: { text: string; color: string } }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', boxShadow: neu.insetSm, marginBottom: 10 }}>
+      <div>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text-muted)', marginBottom: 3 }}>{label.toUpperCase()}</p>
+        {value && <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{value}</p>}
+      </div>
+      {badge && (
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '4px 12px', borderRadius: 999, background: 'var(--bg)', boxShadow: neu.outset, color: badge.color }}>
+          {badge.text.toUpperCase()}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function NeuBtn({ onClick, children, danger, outline }: { onClick?: () => void; children: React.ReactNode; danger?: boolean; outline?: boolean }) {
+  const [pressed, setPressed] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onMouseLeave={() => setPressed(false)}
+      style={{
+        background: 'var(--bg)', border: 'none', borderRadius: 999,
+        padding: '10px 22px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', cursor: 'pointer',
+        color: danger ? '#ef4444' : pressed ? 'var(--accent)' : 'var(--text)',
+        boxShadow: pressed ? neu.inset : neu.outset,
+        transition: 'box-shadow 0.15s, color 0.15s',
+        width: '100%',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
+function NeuInput({ type = 'text', value, onChange, placeholder, label, rightIcon }: {
+  type?: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  placeholder?: string; label?: string; rightIcon?: React.ReactNode
+}) {
+  return (
+    <div style={{ marginBottom: 4 }}>
+      {label && <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text-muted)', marginBottom: 8 }}>{label.toUpperCase()}</p>}
+      <div style={{ position: 'relative' }}>
+        <input
+          type={type} value={value} onChange={onChange} placeholder={placeholder}
+          style={{ width: '100%', background: 'var(--bg)', border: 'none', borderRadius: 14, padding: rightIcon ? '11px 44px 11px 18px' : '11px 18px', fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', color: 'var(--text)', outline: 'none', boxShadow: neu.inset }}
+        />
+        {rightIcon && (
+          <div style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+            {rightIcon}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ── switch neumorfico ── */
+function NeuSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+  return (
+    <div onClick={onChange} style={{ position: 'relative', width: 54, height: 28, borderRadius: 14, background: 'var(--bg)', cursor: 'pointer', flexShrink: 0, boxShadow: checked ? neu.inset : neu.outset, transition: 'box-shadow 0.25s' }}>
+      <div style={{ position: 'absolute', top: 4, left: checked ? 30 : 4, width: 20, height: 20, borderRadius: '50%', background: checked ? 'var(--accent)' : 'var(--text-muted)', transition: 'left 0.25s, background 0.25s', boxShadow: '1px 1px 4px rgba(0,0,0,0.3)' }} />
+    </div>
+  )
+}
+
+/* ── checkbox neumorfica ── */
+function NeuCheck({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+  return (
+    <div onClick={onChange} style={{ width: 22, height: 22, borderRadius: 7, background: 'var(--bg)', cursor: 'pointer', flexShrink: 0, boxShadow: checked ? neu.inset : neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'box-shadow 0.2s', color: checked ? 'var(--accent)' : 'transparent', fontSize: 13 }}>
+      {checked && <Check size={13} />}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   COMPONENTE PRINCIPALE
+   ═══════════════════════════════════════════ */
 export function Impostazioni() {
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
   const { language, setLanguage } = useLanguage()
   const { logout, user } = useAuthStore()
-  
-  // Stato per cambio password
+
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [passwordMessage, setPasswordMessage] = useState('')
-  const [passwordError, setPasswordError] = useState('')
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwErr, setPwErr] = useState('')
 
-  // Stato per notifiche
-  const [notifications, setNotifications] = useState({
-    email: true,
-    sms: false,
-    push: true,
-    newsletter: true,
-  })
-
-  // Stato per privacy
-  const [privacy, setPrivacy] = useState({
-    profileVisible: true,
-    activityVisible: false,
-    emailPublic: false,
-  })
-
-  // Stato per sessioni attive
+  const [notifications, setNotifications] = useState({ email: true, sms: false, push: true, newsletter: true })
+  const [privacy, setPrivacy] = useState({ profileVisible: true, activityVisible: false, emailPublic: false })
   const [sessions] = useState([
     { id: '1', device: 'Windows PC', browser: 'Chrome', location: 'Milano, IT', lastActive: '2 min fa', current: true },
     { id: '2', device: 'iPhone 12', browser: 'Safari', location: 'Roma, IT', lastActive: '2 ore fa', current: false },
     { id: '3', device: 'MacBook Pro', browser: 'Firefox', location: 'Torino, IT', lastActive: '1 giorno fa', current: false },
   ])
 
-  // Funzione cambio password
   const handleChangePassword = () => {
-    setPasswordError('')
-    setPasswordMessage('')
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordError('Riempi tutti i campi')
-      return
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Le password non corrispondono')
-      return
-    }
-
-    if (newPassword.length < 8) {
-      setPasswordError('La password deve avere almeno 8 caratteri')
-      return
-    }
-
-    // Simula cambio password
-    setPasswordMessage('✅ Password cambiata con successo!')
-    setCurrentPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setTimeout(() => {
-      setShowPasswordForm(false)
-      setPasswordMessage('')
-    }, 2000)
+    setPwErr(''); setPwMsg('')
+    if (!currentPassword || !newPassword || !confirmPassword) return setPwErr('Riempi tutti i campi')
+    if (newPassword !== confirmPassword) return setPwErr('Le password non corrispondono')
+    if (newPassword.length < 8) return setPwErr('Minimo 8 caratteri')
+    setPwMsg('Password cambiata con successo!')
+    setCurrentPassword(''); setNewPassword(''); setConfirmPassword('')
+    setTimeout(() => { setShowPasswordForm(false); setPwMsg('') }, 2000)
   }
 
-  // Funzione logout
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
-  // Funzione logout da tutti i dispositivi
-  const handleLogoutAll = () => {
-    logout()
-    navigate('/login')
-  }
+  const handleLogout = () => { logout(); navigate('/login') }
 
   return (
-    <div className="p-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Impostazioni</h1>
-        <p className="text-gray-600 dark:text-gray-400">Gestisci il tuo account e le preferenze</p>
+    <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      <div style={{ marginBottom: 8 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text)', marginBottom: 6 }}>IMPOSTAZIONI</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Gestisci il tuo account e le preferenze</p>
       </div>
 
-      {/* Account Info */}
-      <Card className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <Shield className="w-5 h-5" />
-          Informazioni Account
-        </h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Nome Utente</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{user?.name}</p>
-            </div>
-            <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Verificato</div>
-          </div>
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{user?.email}</p>
-            </div>
-            <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Confermata</div>
-          </div>
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Ruolo</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{user?.id === '1' ? 'Amministratore' : 'Utente'}</p>
-            </div>
-            <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Admin</div>
-          </div>
-        </div>
-      </Card>
+      {/* Account */}
+      <Section icon={Shield} title="INFORMAZIONI ACCOUNT">
+        <InfoRow label="Nome Utente" value={user?.name} badge={{ text: 'Verificato', color: '#10b981' }} />
+        <InfoRow label="Email" value={user?.email} badge={{ text: 'Confermata', color: '#10b981' }} />
+        <InfoRow label="Ruolo" value={user?.id === '1' ? 'Amministratore' : 'Utente'} badge={{ text: 'Admin', color: 'var(--accent)' }} />
+      </Section>
 
-      {/* Cambio Password */}
-      <Card className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <Lock className="w-5 h-5" />
-          Sicurezza & Password
-        </h2>
-        
+      {/* Password */}
+      <Section icon={Lock} title="SICUREZZA & PASSWORD">
         {!showPasswordForm ? (
-          <Button onClick={() => setShowPasswordForm(true)} variant="outline" className="w-full">
-            <Lock className="w-4 h-4 mr-2" />
-            Cambia Password
-          </Button>
+          <NeuBtn onClick={() => setShowPasswordForm(true)}><Lock size={13} /> CAMBIA PASSWORD</NeuBtn>
         ) : (
-          <div className="space-y-4">
-            {/* Password Attuale */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password Attuale</label>
-              <div className="relative">
-                <input
-                  type={showCurrentPassword ? 'text' : 'password'}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Inserisci password attuale"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
-                >
-                  {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <NeuInput type={showCurrent ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Password attuale" label="Password attuale"
+              rightIcon={<span onClick={() => setShowCurrent(!showCurrent)}>{showCurrent ? <EyeOff size={15} /> : <Eye size={15} />}</span>} />
+            <NeuInput type={showNew ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Nuova password" label="Nuova password"
+              rightIcon={<span onClick={() => setShowNew(!showNew)}>{showNew ? <EyeOff size={15} /> : <Eye size={15} />}</span>} />
+            <NeuInput type={showConfirm ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Conferma password" label="Conferma password"
+              rightIcon={<span onClick={() => setShowConfirm(!showConfirm)}>{showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}</span>} />
 
-            {/* Nuova Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nuova Password</label>
-              <div className="relative">
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Inserisci nuova password"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
-                >
-                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Minimo 8 caratteri</p>
-            </div>
+            {pwErr && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#ef4444', fontSize: 12 }}><AlertCircle size={13} />{pwErr}</div>}
+            {pwMsg && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, background: 'rgba(16,185,129,0.08)', color: '#10b981', fontSize: 12 }}><Check size={13} />{pwMsg}</div>}
 
-            {/* Conferma Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Conferma Password</label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Conferma nuova password"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Messaggi */}
-            {passwordError && (
-              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
-                {passwordError}
-              </div>
-            )}
-            {passwordMessage && (
-              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm flex items-center gap-2">
-                <Check className="w-4 h-4" />
-                {passwordMessage}
-              </div>
-            )}
-
-            {/* Pulsanti */}
-            <div className="flex gap-2">
-              <Button onClick={handleChangePassword} className="flex-1">
-                <Save className="w-4 h-4 mr-2" />
-                Salva Nuova Password
-              </Button>
-              <Button onClick={() => setShowPasswordForm(false)} variant="outline" className="flex-1">
-                Annulla
-              </Button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <NeuBtn onClick={handleChangePassword}><Save size={13} /> SALVA</NeuBtn>
+              <NeuBtn onClick={() => setShowPasswordForm(false)}>ANNULLA</NeuBtn>
             </div>
           </div>
         )}
-      </Card>
+      </Section>
 
-    {/* Tema & Lingua */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-  {/* TEMA */}
-  <Card>
-    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-      <Moon className="w-5 h-5" />
-      Tema
-    </h2>
-
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        Modalità corrente:
-        <span className="font-semibold text-gray-900 dark:text-white ml-1">
-          {theme === 'dark' ? 'Scura 🌙' : 'Chiara ☀️'}
-        </span>
-      </p>
-
-      <Switch
-        checked={theme === 'dark'}
-        onCheckedChange={toggleTheme}
-      />
-    </div>
-  </Card>
-
-  {/* LINGUA */}
-  <Card>
-    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-      <Globe className="w-5 h-5" />
-      Lingua
-    </h2>
-
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        Lingua corrente:
-        <span className="font-semibold text-gray-900 dark:text-white ml-1">
-          {language === 'it' ? 'Italiano 🇮🇹' : 'English 🇬🇧'}
-        </span>
-      </p>
-
-      <Switch
-        checked={language === 'it'}
-        onCheckedChange={() => setLanguage(language === 'it' ? 'en' : 'it')}
-      />
-    </div>
-  </Card>
-</div>
-
+      {/* Tema & Lingua */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        <Section icon={Moon} title="TEMA">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              {theme === 'dark' ? '🌙 Scura' : '☀️ Chiara'}
+            </span>
+            <NeuSwitch checked={theme === 'dark'} onChange={toggleTheme} />
+          </div>
+        </Section>
+        <Section icon={Globe} title="LINGUA">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              {language === 'it' ? '🇮🇹 Italiano' : '🇬🇧 English'}
+            </span>
+            {/* pill IT / EN */}
+            <div style={{ display: 'flex', borderRadius: 999, overflow: 'hidden', background: 'var(--bg)', boxShadow: neu.inset }}>
+              {(['it', 'en'] as const).map(l => (
+                <button key={l} onClick={() => setLanguage(l)} style={{ width: 32, height: 26, border: 'none', borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', cursor: 'pointer', background: language === l ? 'var(--bg)' : 'transparent', color: language === l ? 'var(--accent)' : 'var(--text-muted)', boxShadow: language === l ? neu.outset : 'none', transition: 'box-shadow 0.2s, color 0.2s' }}>
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Section>
+      </div>
 
       {/* Notifiche */}
-      <Card className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <Bell className="w-5 h-5" />
-          Preferenze Notifiche
-        </h2>
-        <div className="space-y-4">
+      <Section icon={Bell} title="PREFERENZE NOTIFICHE">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
-            { key: 'email', label: 'Notifiche Email', description: 'Ricevi aggiornamenti via email' },
-            { key: 'sms', label: 'Notifiche SMS', description: 'Ricevi avvisi importanti via SMS' },
-            { key: 'push', label: 'Notifiche Push', description: 'Avvisi in tempo reale sul browser' },
-            { key: 'newsletter', label: 'Newsletter', description: 'Newsletter settimanale con notizie' },
-          ].map((notif) => (
-            <label key={notif.key} className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              <input
-                type="checkbox"
-                checked={notifications[notif.key as keyof typeof notifications]}
-                onChange={(e) => setNotifications({ ...notifications, [notif.key]: e.target.checked })}
-                className="w-5 h-5 text-primary rounded cursor-pointer"
-              />
-              <div className="ml-3 flex-1">
-                <p className="font-medium text-gray-900 dark:text-white">{notif.label}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{notif.description}</p>
-              </div>
-            </label>
-          ))}
-        </div>
-      </Card>
-
-      {/* Privacy */}
-      <Card className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <Shield className="w-5 h-5" />
-          Privacy & Visibilità
-        </h2>
-        <div className="space-y-4">
-          {[
-            { key: 'profileVisible', label: 'Profilo Pubblico', description: 'Il tuo profilo è visibile agli altri utenti' },
-            { key: 'activityVisible', label: 'Attività Visibile', description: 'Mostra la tua attività recente' },
-            { key: 'emailPublic', label: 'Email Pubblica', description: 'Condividi la tua email con altri' },
-          ].map((priv) => (
-            <label key={priv.key} className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              <input
-                type="checkbox"
-                checked={privacy[priv.key as keyof typeof privacy]}
-                onChange={(e) => setPrivacy({ ...privacy, [priv.key]: e.target.checked })}
-                className="w-5 h-5 text-primary rounded cursor-pointer"
-              />
-              <div className="ml-3 flex-1">
-                <p className="font-medium text-gray-900 dark:text-white">{priv.label}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{priv.description}</p>
-              </div>
-            </label>
-          ))}
-        </div>
-      </Card>
-
-      {/* Sessioni Attive */}
-      <Card className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Sessioni Attive</h2>
-        <div className="space-y-3">
-          {sessions.map((session) => (
-            <div key={session.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{session.device}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">{session.browser} • {session.location}</p>
-                  <p className="text-xs text-gray-500 mt-1">Ultimo accesso: {session.lastActive}</p>
-                </div>
-                <div className="text-right">
-                  {session.current && <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Sessione Attuale</div>}
-                </div>
+            { key: 'email', label: 'Notifiche Email', desc: 'Ricevi aggiornamenti via email' },
+            { key: 'sms', label: 'Notifiche SMS', desc: 'Ricevi avvisi importanti via SMS' },
+            { key: 'push', label: 'Notifiche Push', desc: 'Avvisi in tempo reale sul browser' },
+            { key: 'newsletter', label: 'Newsletter', desc: 'Newsletter settimanale' },
+          ].map(n => (
+            <div key={n.key} onClick={() => setNotifications(s => ({ ...s, [n.key]: !s[n.key as keyof typeof s] }))} style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', cursor: 'pointer', boxShadow: neu.insetSm }}>
+              <NeuCheck checked={notifications[n.key as keyof typeof notifications]} onChange={() => {}} />
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{n.label}</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{n.desc}</p>
               </div>
             </div>
           ))}
         </div>
-        <Button onClick={handleLogoutAll} variant="danger" className="w-full mt-4">
-          <LogOut className="w-4 h-4 mr-2" />
-          Esci da Tutti i Dispositivi
-        </Button>
-      </Card>
+      </Section>
+
+      {/* Privacy */}
+      <Section icon={Shield} title="PRIVACY & VISIBILITÀ">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            { key: 'profileVisible', label: 'Profilo Pubblico', desc: 'Il tuo profilo è visibile agli altri' },
+            { key: 'activityVisible', label: 'Attività Visibile', desc: 'Mostra la tua attività recente' },
+            { key: 'emailPublic', label: 'Email Pubblica', desc: 'Condividi la tua email con altri' },
+          ].map(p => (
+            <div key={p.key} onClick={() => setPrivacy(s => ({ ...s, [p.key]: !s[p.key as keyof typeof s] }))} style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', cursor: 'pointer', boxShadow: neu.insetSm }}>
+              <NeuCheck checked={privacy[p.key as keyof typeof privacy]} onChange={() => {}} />
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{p.label}</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Sessioni */}
+      <Section icon={Shield} title="SESSIONI ATTIVE">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 18 }}>
+          {sessions.map(s => (
+            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', boxShadow: neu.insetSm }}>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{s.device}</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.browser} · {s.location}</p>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Ultimo accesso: {s.lastActive}</p>
+              </div>
+              {s.current && (
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '4px 12px', borderRadius: 999, background: 'var(--bg)', boxShadow: neu.outset, color: '#10b981' }}>ATTIVA</span>
+              )}
+            </div>
+          ))}
+        </div>
+        <NeuBtn onClick={handleLogout} danger><LogOut size={13} /> ESCI DA TUTTI I DISPOSITIVI</NeuBtn>
+      </Section>
 
       {/* Logout */}
-      <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
-        <h2 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-4 flex items-center gap-2">
-          <LogOut className="w-5 h-5" />
-          Logout
-        </h2>
-        <p className="text-sm text-red-800 dark:text-red-300 mb-4">Esci dal tuo account corrente.</p>
-        <Button onClick={handleLogout} variant="danger" className="w-full">
-          <LogOut className="w-4 h-4 mr-2" />
-          Esci Ora
-        </Button>
-      </Card>
+      <div style={{ ...glass, borderRadius: 24, padding: '26px', boxShadow: neu.panel, border: '1px solid rgba(239,68,68,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+            <LogOut size={15} />
+          </div>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.18em', color: '#ef4444' }}>LOGOUT</span>
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>Esci dal tuo account corrente.</p>
+        <NeuBtn onClick={handleLogout} danger><LogOut size={13} /> ESCI ORA</NeuBtn>
+      </div>
+
     </div>
   )
 }

@@ -1,19 +1,55 @@
 import React from 'react'
 
+const neu = {
+  inset: `inset 3px 3px 8px var(--neu-dark), inset -2px -2px 5px var(--neu-light)`,
+}
+
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
 }
 
-export function Input({ label, error, className = '', ...props }: InputProps) {
+export function Input({ label, error, style, ...props }: InputProps) {
   return (
-    <div className="w-full">
-      {label && <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{label}</label>}
+    <div style={{ width: '100%' }}>
+      {label && (
+        <label style={{
+          display: 'block',
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.18em',
+          color: 'var(--text-muted)',
+          marginBottom: 8,
+        }}>
+          {label.toUpperCase()}
+        </label>
+      )}
       <input
-        className={`w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary ${error ? 'border-danger focus:ring-danger' : ''} ${className}`}
+        style={{
+          width: '100%',
+          background: 'var(--bg)',
+          border: 'none',
+          borderRadius: 14,
+          padding: '11px 18px',
+          fontSize: 13,
+          fontWeight: 500,
+          letterSpacing: '0.06em',
+          color: 'var(--text)',
+          outline: 'none',
+          fontFamily: 'inherit',
+          boxShadow: error
+            ? `inset 3px 3px 8px rgba(239,68,68,0.25), inset -2px -2px 5px var(--neu-light)`
+            : neu.inset,
+          transition: 'box-shadow 0.2s',
+          ...style,
+        }}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-danger">{error}</p>}
+      {error && (
+        <p style={{ marginTop: 6, fontSize: 11, color: '#ef4444', letterSpacing: '0.06em' }}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }

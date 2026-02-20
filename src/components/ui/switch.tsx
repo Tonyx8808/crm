@@ -1,32 +1,52 @@
 "use client"
 
-import * as React from "react"
-import * as SwitchPrimitives from "@radix-ui/react-switch"
-import { cn } from "@/lib/utils"
+import React, { useState } from 'react'
 
-const Switch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(
-      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      "disabled:cursor-not-allowed disabled:opacity-50",
-      "data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-700",
-      className
-    )}
-    {...props}
-    ref={ref}
-  >
-    <SwitchPrimitives.Thumb
-      className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform",
-        "data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
-      )}
-    />
-  </SwitchPrimitives.Root>
-))
-Switch.displayName = SwitchPrimitives.Root.displayName
+const neu = {
+  outset: `4px 4px 10px var(--neu-dark), -2px -2px 7px var(--neu-light)`,
+  inset:  `inset 3px 3px 7px var(--neu-dark), inset -2px -2px 4px var(--neu-light)`,
+}
 
-export { Switch }
+interface SwitchProps {
+  checked?: boolean
+  onCheckedChange?: (checked: boolean) => void
+  disabled?: boolean
+  className?: string
+}
+
+export const Switch = React.forwardRef<HTMLDivElement, SwitchProps>(
+  ({ checked = false, onCheckedChange, disabled = false }, ref) => {
+    return (
+      <div
+        ref={ref}
+        role="switch"
+        aria-checked={checked}
+        onClick={() => !disabled && onCheckedChange?.(!checked)}
+        style={{
+          position: 'relative',
+          width: 54, height: 28,
+          borderRadius: 14,
+          background: 'var(--bg)',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.5 : 1,
+          flexShrink: 0,
+          /* inset quando ON (premuto/attivo), outset quando OFF */
+          boxShadow: checked ? neu.inset : neu.outset,
+          transition: 'box-shadow 0.25s',
+        }}
+      >
+        <div style={{
+          position: 'absolute',
+          top: 4,
+          left: checked ? 30 : 4,
+          width: 20, height: 20,
+          borderRadius: '50%',
+          background: checked ? 'var(--accent)' : 'var(--text-muted)',
+          boxShadow: '1px 1px 4px rgba(0,0,0,0.3)',
+          transition: 'left 0.25s cubic-bezier(.4,0,.2,1), background 0.25s',
+        }} />
+      </div>
+    )
+  }
+)
+Switch.displayName = 'Switch'

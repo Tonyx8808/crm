@@ -1,4 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+const neu = {
+  outset: `5px 5px 14px var(--neu-dark), -3px -3px 9px var(--neu-light)`,
+  inset:  `inset 3px 3px 8px var(--neu-dark), inset -2px -2px 5px var(--neu-light)`,
+}
+
+const variantColor: Record<string, string> = {
+  primary:   'var(--accent)',
+  secondary: '#8b5cf6',
+  danger:    '#ef4444',
+  outline:   'var(--text)',
+}
+
+const sizeStyle: Record<string, React.CSSProperties> = {
+  sm: { padding: '7px 16px',  fontSize: 11 },
+  md: { padding: '10px 22px', fontSize: 12 },
+  lg: { padding: '13px 28px', fontSize: 13 },
+}
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'outline'
@@ -11,29 +29,38 @@ export function Button({
   variant = 'primary',
   size = 'md',
   loading = false,
-  className = '',
   children,
+  style,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'font-medium rounded-lg transition-all duration-200 focus:outline-none'
-  
-  const variants: Record<string, string> = {
-    primary: 'bg-primary text-white hover:bg-primary/90 dark:hover:bg-primary/80',
-    secondary: 'bg-secondary text-white hover:bg-secondary/90',
-    danger: 'bg-danger text-white hover:bg-danger/90',
-    outline: 'border-2 border-primary text-primary hover:bg-primary/10 dark:hover:bg-primary/20',
-  }
-
-  const sizes: Record<string, string> = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2.5 text-base',
-    lg: 'px-6 py-3 text-lg',
-  }
+  const [pressed, setPressed] = useState(false)
+  const color = variantColor[variant] ?? 'var(--text)'
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
       disabled={loading || props.disabled}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onMouseLeave={() => setPressed(false)}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 7,
+        background: 'var(--bg)',
+        border: 'none',
+        borderRadius: 999,
+        fontFamily: 'inherit',
+        fontWeight: 700,
+        letterSpacing: '0.14em',
+        cursor: loading || props.disabled ? 'not-allowed' : 'pointer',
+        color: pressed ? color : color,
+        opacity: loading || props.disabled ? 0.55 : 1,
+        boxShadow: pressed ? neu.inset : neu.outset,
+        transition: 'box-shadow 0.15s, opacity 0.2s',
+        ...sizeStyle[size],
+        ...style,
+      }}
       {...props}
     >
       {loading ? '⏳ ' : ''}{children}

@@ -1,6 +1,5 @@
 'use client'
 
-import { Card } from '@/components/ui'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -11,229 +10,237 @@ import 'react-calendar/dist/Calendar.css'
 import { Users, TrendingUp, DollarSign, Target, Clock, CalendarDays } from 'lucide-react'
 import { useState } from 'react'
 
-// Tipo corretto per React-Calendar
 type CalendarValue = Date | [Date, Date] | null
 
-export function Dashboard() {
-  const {
-    clienti,
-    opportunita,
-    attivita,
-    getTotalRevenue,
-    getTotalPipeline,
-    getClientiByStatus
-  } = useCRMStore()
+const neu = {
+  outset:  `5px 5px 14px var(--neu-dark), -3px -3px 9px var(--neu-light)`,
+  inset:   `inset 3px 3px 8px var(--neu-dark), inset -2px -2px 5px var(--neu-light)`,
+  insetSm: `inset 2px 2px 5px var(--neu-dark), inset -1px -1px 3px var(--neu-light)`,
+  panel:   `8px 8px 20px var(--neu-dark), -5px -5px 14px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.2)`,
+}
 
-  const activeClients = getClientiByStatus('Attivo').length
-  const totalRevenue = getTotalRevenue()
-  const totalPipeline = getTotalPipeline()
+const glass: React.CSSProperties = {
+  background: 'var(--glass-bg)',
+  border: '1px solid var(--glass-border)',
+  backdropFilter: 'blur(24px) saturate(1.5)',
+  WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+}
+
+function NeuPanel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div style={{ ...glass, borderRadius: 24, padding: '28px 26px', boxShadow: neu.panel, ...style }}>
+      {children}
+    </div>
+  )
+}
+
+function PanelTitle({ icon: Icon, children }: { icon?: any; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 26 }}>
+      {Icon && (
+        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', flexShrink: 0 }}>
+          <Icon size={15} />
+        </div>
+      )}
+      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text)' }}>
+        {children}
+      </span>
+    </div>
+  )
+}
+
+export function Dashboard() {
+  const { clienti, opportunita, attivita, getTotalRevenue, getTotalPipeline, getClientiByStatus } = useCRMStore()
+
+  const activeClients    = getClientiByStatus('Attivo').length
+  const totalRevenue     = getTotalRevenue()
+  const totalPipeline    = getTotalPipeline()
   const opportunitiesCount = opportunita.length
 
   const [date, setDate] = useState<CalendarValue>(new Date())
 
-  // --- EVENTI CALENDARIO ---
   const eventsByDate: Record<string, Array<{ type: string; title: string }>> = {}
-
   attivita.forEach(a => {
-    const key = a.date
-    if (!eventsByDate[key]) eventsByDate[key] = []
-    eventsByDate[key].push({ type: a.type, title: a.title })
+    if (!eventsByDate[a.date]) eventsByDate[a.date] = []
+    eventsByDate[a.date].push({ type: a.type, title: a.title })
   })
-
   opportunita.forEach(o => {
-    const key = o.closeDate
-    if (!eventsByDate[key]) eventsByDate[key] = []
-    eventsByDate[key].push({ type: 'opportunità', title: o.title })
+    if (!eventsByDate[o.closeDate]) eventsByDate[o.closeDate] = []
+    eventsByDate[o.closeDate].push({ type: 'opportunità', title: o.title })
   })
 
-  const tileClassName = ({ date }: { date: Date }) => {
-    const key = date.toISOString().split('T')[0]
-    if (eventsByDate[key]) {
-      return 'relative after:content-[""] after:w-2 after:h-2 after:bg-blue-600 after:rounded-full after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2'
-    }
-    return ''
+  const tileClassName = ({ date: d }: { date: Date }) => {
+    const key = d.toISOString().split('T')[0]
+    return eventsByDate[key] ? 'has-event' : ''
   }
 
-  const selectedDateKey =
-    date instanceof Date ? date.toISOString().split('T')[0] : null
+  const selectedDateKey = date instanceof Date ? date.toISOString().split('T')[0] : null
+  const eventsForSelectedDay = selectedDateKey && eventsByDate[selectedDateKey] ? eventsByDate[selectedDateKey] : []
 
-  const eventsForSelectedDay =
-    selectedDateKey && eventsByDate[selectedDateKey]
-      ? eventsByDate[selectedDateKey]
-      : []
-
-  // --- AGENDA SETTIMANALE ---
   const getWeekEvents = () => {
     const today = new Date()
     const start = new Date(today)
-    start.setDate(today.getDate() - today.getDay() + 1) // lunedì
-
-    const end = new Date(start)
-    end.setDate(start.getDate() + 6)
-
+    start.setDate(today.getDate() - today.getDay() + 1)
+    const end = new Date(start); end.setDate(start.getDate() + 6)
     const weekEvents: Array<{ date: string; title: string; type: string }> = []
-
     Object.keys(eventsByDate).forEach(key => {
       const d = new Date(key)
-      if (d >= start && d <= end) {
-        eventsByDate[key].forEach(ev => {
-          weekEvents.push({ date: key, title: ev.title, type: ev.type })
-        })
-      }
+      if (d >= start && d <= end)
+        eventsByDate[key].forEach(ev => weekEvents.push({ date: key, title: ev.title, type: ev.type }))
     })
-
     return weekEvents.sort((a, b) => a.date.localeCompare(b.date))
   }
 
   const weeklyEvents = getWeekEvents()
-
-  // --- TIMELINE ---
-  const timeline = attivita
-    .map(a => ({ date: a.date, title: a.title, type: a.type }))
-    .sort((a, b) => a.date.localeCompare(b.date))
-
-  // --- ATTIVITÀ IMMINENTI ---
+  const timeline = attivita.map(a => ({ date: a.date, title: a.title, type: a.type })).sort((a, b) => a.date.localeCompare(b.date))
   const upcoming = attivita.filter(a => {
-    const today = new Date()
-    const d = new Date(a.date)
-    const diff = (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    const diff = (new Date(a.date).getTime() - Date.now()) / 86400000
     return diff >= 0 && diff <= 7
   })
 
-  // --- GRAFICI ---
   const chartData = [
-    { month: 'Gen', value: 12000 },
-    { month: 'Feb', value: 18000 },
-    { month: 'Mar', value: 15000 },
-    { month: 'Apr', value: 22000 },
-    { month: 'May', value: 25000 },
-    { month: 'Jun', value: 28000 }
+    { month: 'Gen', value: 12000 }, { month: 'Feb', value: 18000 },
+    { month: 'Mar', value: 15000 }, { month: 'Apr', value: 22000 },
+    { month: 'Mag', value: 25000 }, { month: 'Giu', value: 28000 },
   ]
 
   const stageData = opportunita.reduce((acc, opp) => {
-    const existing = acc.find(item => item.name === opp.stage)
-    if (existing) existing.value += opp.value
+    const ex = acc.find(i => i.name === opp.stage)
+    if (ex) ex.value += opp.value
     else acc.push({ name: opp.stage, value: opp.value })
     return acc
   }, [] as Array<{ name: string; value: number }>)
 
-  const colors = ['#0066FF', '#7C3AED', '#10B981', '#F59E0B', '#EF4444', '#06B6D4']
+  const colors = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4']
+
+  const kpis = [
+    { icon: Users,       label: 'CLIENTI ATTIVI',  value: activeClients },
+    { icon: Target,      label: 'OPPORTUNITÀ',     value: opportunitiesCount },
+    { icon: DollarSign,  label: 'RICAVI TOTALI',   value: `€${totalRevenue.toLocaleString()}` },
+    { icon: TrendingUp,  label: 'PIPELINE',        value: `€${totalPipeline.toLocaleString()}` },
+  ]
 
   return (
-    <div className="p-8 space-y-8">
+    <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', gap: 32 }}>
 
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+      <style>{`
+        .react-calendar { background: transparent !important; border: none !important; width: 100% !important; font-family: inherit !important; }
+        .react-calendar__tile { background: var(--bg) !important; border-radius: 10px !important; color: var(--text) !important; box-shadow: ${neu.outset}; margin: 2px !important; font-size: 11px !important; font-weight: 600 !important; }
+        .react-calendar__tile--active { box-shadow: ${neu.inset} !important; color: var(--accent) !important; }
+        .react-calendar__tile.has-event::after { content: ''; display: block; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; margin: 2px auto 0; }
+        .react-calendar__navigation button { background: var(--bg) !important; border-radius: 10px !important; color: var(--text) !important; box-shadow: ${neu.outset}; font-weight: 700 !important; font-size: 12px !important; }
+        .react-calendar__month-view__weekdays__weekday { color: var(--text-muted) !important; font-size: 10px !important; font-weight: 700 !important; letter-spacing: 0.1em !important; }
+        .react-calendar__month-view__weekdays__weekday abbr { text-decoration: none !important; }
+      `}</style>
+
+      <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text)', marginBottom: 8 }}>DASHBOARD</h1>
 
       {/* KPI */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card><p>Clienti Attivi: {activeClients}</p></Card>
-        <Card><p>Opportunità: {opportunitiesCount}</p></Card>
-        <Card><p>Ricavi Totali: €{totalRevenue.toLocaleString()}</p></Card>
-        <Card><p>Pipeline: €{totalPipeline.toLocaleString()}</p></Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+        {kpis.map(({ icon: Icon, label, value }) => (
+          <div key={label} style={{ background: 'var(--bg)', borderRadius: 22, padding: '26px 22px', boxShadow: neu.outset, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.inset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+              <Icon size={17} />
+            </div>
+            <div>
+              <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: 'var(--text-muted)', marginBottom: 4 }}>{label}</p>
+              <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: '0.04em' }}>{value}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* GRAFICI */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <h2>Trend Revenue</h2>
-          <ResponsiveContainer width="100%" height={300}>
+      {/* Grafici */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <NeuPanel>
+          <PanelTitle icon={TrendingUp}>TREND REVENUE</PanelTitle>
+          <ResponsiveContainer width="100%" height={220}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#0066FF" strokeWidth={3} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" />
+              <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 11, fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: 'var(--bg)', border: '1px solid var(--glass-border)', borderRadius: 12, color: 'var(--text)', fontSize: 12 }} />
+              <Line type="monotone" dataKey="value" stroke="var(--accent)" strokeWidth={3} dot={{ fill: 'var(--accent)', r: 4, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
-        </Card>
+        </NeuPanel>
 
-        <Card>
-          <h2>Pipeline Opportunità</h2>
-          <ResponsiveContainer width="100%" height={300}>
+        <NeuPanel>
+          <PanelTitle icon={Target}>PIPELINE OPPORTUNITÀ</PanelTitle>
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
-              <Pie data={stageData} dataKey="value" nameKey="name" outerRadius={120}>
-                {stageData.map((_, i) => (
-                  <Cell key={i} fill={colors[i % colors.length]} />
-                ))}
+              <Pie data={stageData} dataKey="value" nameKey="name" outerRadius={90} innerRadius={40}>
+                {stageData.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}
               </Pie>
-              <Tooltip />
+              <Tooltip contentStyle={{ background: 'var(--bg)', border: '1px solid var(--glass-border)', borderRadius: 12, color: 'var(--text)', fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
-        </Card>
+        </NeuPanel>
       </div>
 
-      {/* CALENDARIO + AGENDA */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* CALENDARIO */}
-        <Card>
-          <h2>Calendario</h2>
-          <Calendar
-            onChange={(value) => setDate(value as CalendarValue)}
-            value={date}
-            tileClassName={tileClassName}
-          />
-
+      {/* Calendario + Agenda */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <NeuPanel>
+          <PanelTitle icon={CalendarDays}>CALENDARIO</PanelTitle>
+          <Calendar onChange={v => setDate(v as CalendarValue)} value={date} tileClassName={tileClassName} />
           {eventsForSelectedDay.length > 0 && (
-            <div className="mt-4 space-y-2">
-              <h3>Eventi del giorno</h3>
+            <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text-muted)', marginBottom: 4 }}>EVENTI DEL GIORNO</p>
               {eventsForSelectedDay.map((ev, i) => (
-                <div key={i} className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
-                  <p>{ev.title}</p>
-                  <p className="text-xs text-gray-500">{ev.type}</p>
+                <div key={i} style={{ background: 'var(--bg)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', marginTop: 2 }}>{ev.type.toUpperCase()}</p>
                 </div>
               ))}
             </div>
           )}
-        </Card>
+        </NeuPanel>
 
-        {/* AGENDA SETTIMANALE */}
-        <Card>
-          <h2 className="flex items-center gap-2"><CalendarDays /> Agenda settimanale</h2>
-          {weeklyEvents.length === 0 && <p>Nessun evento questa settimana</p>}
-          <div className="space-y-3">
-            {weeklyEvents.map((ev, i) => (
-              <div key={i} className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800">
-                <p className="font-medium">{ev.title}</p>
-                <p className="text-xs text-gray-500">{ev.date} — {ev.type}</p>
+        <NeuPanel>
+          <PanelTitle icon={CalendarDays}>AGENDA SETTIMANALE</PanelTitle>
+          {weeklyEvents.length === 0
+            ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nessun evento questa settimana</p>
+            : <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {weeklyEvents.map((ev, i) => (
+                  <div key={i} style={{ background: 'var(--bg)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
+                    <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 7 }}>{ev.date} · {ev.type}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </Card>
-
+          }
+        </NeuPanel>
       </div>
 
-      {/* TIMELINE + UPCOMING */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* TIMELINE */}
-        <Card>
-          <h2 className="flex items-center gap-2"><Clock /> Timeline attività</h2>
-          <div className="border-l border-gray-300 dark:border-gray-700 ml-3 mt-4 space-y-4">
+      {/* Timeline + Imminenti */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <NeuPanel>
+          <PanelTitle icon={Clock}>TIMELINE ATTIVITÀ</PanelTitle>
+          <div style={{ borderLeft: '2px solid var(--glass-border)', marginLeft: 10, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 22 }}>
             {timeline.map((ev, i) => (
-              <div key={i} className="ml-4">
-                <div className="w-3 h-3 bg-blue-600 rounded-full -ml-[22px] mb-1"></div>
-                <p className="font-medium">{ev.title}</p>
-                <p className="text-xs text-gray-500">{ev.date} — {ev.type}</p>
+              <div key={i} style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', left: -25, top: 4, width: 12, height: 12, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, border: '2px solid var(--accent)' }} />
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 7 }}>{ev.date} · {ev.type}</p>
               </div>
             ))}
           </div>
-        </Card>
+        </NeuPanel>
 
-        {/* ATTIVITÀ IMMINENTI */}
-        <Card>
-          <h2>Attività imminenti (7 giorni)</h2>
-          {upcoming.length === 0 && <p>Nessuna attività imminente</p>}
-          <div className="space-y-3 mt-4">
-            {upcoming.map((ev, i) => (
-              <div key={i} className="p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
-                <p className="font-medium">{ev.title}</p>
-                <p className="text-xs text-gray-600">{ev.date} — {ev.type}</p>
+        <NeuPanel>
+          <PanelTitle>ATTIVITÀ IMMINENTI (7 GIORNI)</PanelTitle>
+          {upcoming.length === 0
+            ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nessuna attività imminente</p>
+            : <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {upcoming.map((ev, i) => (
+                  <div key={i} style={{ background: 'var(--bg)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm, borderLeft: '3px solid var(--accent)' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
+                    <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 7 }}>{ev.date} · {ev.type}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </Card>
-
+          }
+        </NeuPanel>
       </div>
     </div>
   )

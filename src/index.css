@@ -2,10 +2,197 @@
 @tailwind components;
 @tailwind utilities;
 
-* { @apply transition-colors duration-200; }
-html { @apply scroll-smooth; }
-body { @apply bg-gray-50 dark:bg-gray-900; }
+/* ══════════════════════════════════════════════════
+   VARIABILI SISTEMA NEUMORFICO
+   ══════════════════════════════════════════════════ */
+:root {
+  /* sfondo base neumorfico */
+  --bg:           #dde4ee;
+  --neu-light:    #ffffff;
+  --neu-dark:     #b0baca;
 
-::-webkit-scrollbar { @apply w-2; }
-::-webkit-scrollbar-track { @apply bg-gray-200 dark:bg-gray-800; }
-::-webkit-scrollbar-thumb { @apply bg-gray-400 dark:bg-gray-600 rounded-full; }
+  /* frost glass */
+  --glass-bg:     rgba(255, 255, 255, 0.30);
+  --glass-border: rgba(255, 255, 255, 0.60);
+
+  /* testo */
+  --text:         #1e2a3a;
+  --text-muted:   rgba(30, 42, 58, 0.50);
+
+  /* accento */
+  --accent:       #6366f1;
+
+  /* transizione globale */
+  --r: 0.28s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* ══════════════════════════════════════════════════
+   DARK MODE
+   ══════════════════════════════════════════════════ */
+.dark {
+  --bg:           #0f172a;
+  --neu-light:    rgba(255, 255, 255, 0.06);
+  --neu-dark:     rgba(0, 0, 0, 0.55);
+
+  --glass-bg:     rgba(15, 23, 42, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.12);
+
+  --text:         #e2e8f0;
+  --text-muted:   rgba(226, 232, 240, 0.42);
+}
+
+/* ══════════════════════════════════════════════════
+   RESET & BASE
+   ══════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* transizione colori globale */
+  transition:
+    background-color var(--r),
+    color            var(--r),
+    border-color     var(--r),
+    box-shadow       var(--r);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Poppins', system-ui, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════════════════════════
+   SCROLLBAR NEUMORFICA
+   ══════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+  box-shadow:
+    inset 2px 2px 5px var(--neu-dark),
+    inset -1px -1px 3px var(--neu-light);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 999px;
+  box-shadow:
+    2px 2px 5px var(--neu-dark),
+    -1px -1px 3px var(--neu-light);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ══════════════════════════════════════════════════
+   SELEZIONE TESTO
+   ══════════════════════════════════════════════════ */
+::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════════════
+   FOCUS ACCESSIBILE
+   ══════════════════════════════════════════════════ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ══════════════════════════════════════════════════
+   INPUT / SELECT reset
+   (lo stile neumorfico è nei componenti,
+    qui solo il reset necessario)
+   ══════════════════════════════════════════════════ */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ══════════════════════════════════════════════════
+   REACT-CALENDAR override neumorfico
+   (usato in Dashboard)
+   ══════════════════════════════════════════════════ */
+.react-calendar {
+  background: transparent !important;
+  border: none !important;
+  width: 100% !important;
+  font-family: inherit !important;
+}
+
+.react-calendar__tile {
+  background: var(--bg) !important;
+  border-radius: 10px !important;
+  color: var(--text) !important;
+  box-shadow:
+    4px 4px 10px var(--neu-dark),
+    -2px -2px 7px var(--neu-light);
+  margin: 2px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  transition: box-shadow var(--r) !important;
+}
+
+.react-calendar__tile:hover {
+  box-shadow:
+    6px 6px 14px var(--neu-dark),
+    -3px -3px 9px var(--neu-light) !important;
+}
+
+.react-calendar__tile--active {
+  box-shadow:
+    inset 3px 3px 8px var(--neu-dark),
+    inset -2px -2px 5px var(--neu-light) !important;
+  color: var(--accent) !important;
+}
+
+.react-calendar__tile.has-event::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin: 2px auto 0;
+}
+
+.react-calendar__navigation button {
+  background: var(--bg) !important;
+  border-radius: 10px !important;
+  color: var(--text) !important;
+  box-shadow:
+    4px 4px 10px var(--neu-dark),
+    -2px -2px 7px var(--neu-light);
+  font-weight: 700 !important;
+  font-size: 12px !important;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  color: var(--text-muted) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+}

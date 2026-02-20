@@ -7,13 +7,19 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div style={{
+      display: 'flex',
+      height: '100vh',
+      background: 'var(--bg)',
+      overflow: 'hidden',
+      transition: 'background 0.3s',
+    }}>
       <Sidebar open={true} onClose={() => setSidebarOpen(false)} />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        
-        <main className="flex-1 overflow-y-auto">
+
+        <main style={{ flex: 1, overflowY: 'auto' }}>
           <Outlet />
         </main>
       </div>
