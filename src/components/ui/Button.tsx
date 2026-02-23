@@ -47,17 +47,22 @@ export function Button({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 7,
-        background: 'var(--bg)',
-        border: 'none',
+        /* glass */
+        background: pressed
+          ? `color-mix(in srgb, ${color} 18%, transparent)`
+          : `color-mix(in srgb, ${color} 10%, transparent)`,
+        border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
+        backdropFilter: 'blur(18px) saturate(1.5)',
+        WebkitBackdropFilter: 'blur(18px) saturate(1.5)',
         borderRadius: 999,
         fontFamily: 'inherit',
         fontWeight: 700,
         letterSpacing: '0.14em',
         cursor: loading || props.disabled ? 'not-allowed' : 'pointer',
-        color: pressed ? color : color,
+        color,
         opacity: loading || props.disabled ? 0.55 : 1,
         boxShadow: pressed ? neu.inset : neu.outset,
-        transition: 'box-shadow 0.15s, opacity 0.2s',
+        transition: 'box-shadow 0.15s, background 0.15s, opacity 0.2s',
         ...sizeStyle[size],
         ...style,
       }}

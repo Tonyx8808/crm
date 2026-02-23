@@ -27,8 +27,13 @@ export function Input({ label, error, style, ...props }: InputProps) {
       <input
         style={{
           width: '100%',
-          background: 'var(--bg)',
-          border: 'none',
+          /* glass */
+          background: 'rgba(255,255,255,0.06)',
+          backdropFilter: 'blur(14px) saturate(1.4)',
+          WebkitBackdropFilter: 'blur(14px) saturate(1.4)',
+          border: error
+            ? '1px solid rgba(239,68,68,0.40)'
+            : '1px solid rgba(255,255,255,0.12)',
           borderRadius: 14,
           padding: '11px 18px',
           fontSize: 13,
@@ -38,9 +43,9 @@ export function Input({ label, error, style, ...props }: InputProps) {
           outline: 'none',
           fontFamily: 'inherit',
           boxShadow: error
-            ? `inset 3px 3px 8px rgba(239,68,68,0.25), inset -2px -2px 5px var(--neu-light)`
+            ? `inset 3px 3px 8px rgba(239,68,68,0.18), inset -2px -2px 5px var(--neu-light)`
             : neu.inset,
-          transition: 'box-shadow 0.2s',
+          transition: 'box-shadow 0.2s, border-color 0.2s',
           ...style,
         }}
         {...props}

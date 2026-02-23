@@ -18,18 +18,27 @@ const menuItems = [
 ]
 
 const neu = {
-  outset:     `5px 5px 14px var(--neu-dark), -3px -3px 9px var(--neu-light)`,
-  outsetHover:`7px 7px 18px var(--neu-dark), -4px -4px 11px var(--neu-light)`,
-  inset:      `inset 4px 4px 10px var(--neu-dark), inset -2px -2px 6px var(--neu-light)`,
-  insetSm:    `inset 2px 2px 5px var(--neu-dark), inset -1px -1px 3px var(--neu-light)`,
-  panel:      `8px 8px 20px var(--neu-dark), -5px -5px 14px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.2)`,
+  outset:      `5px 5px 14px var(--neu-dark), -3px -3px 9px var(--neu-light)`,
+  outsetHover: `7px 7px 18px var(--neu-dark), -4px -4px 11px var(--neu-light)`,
+  inset:       `inset 4px 4px 10px var(--neu-dark), inset -2px -2px 6px var(--neu-light)`,
+  insetSm:     `inset 2px 2px 5px var(--neu-dark), inset -1px -1px 3px var(--neu-light)`,
+  panel:       `8px 8px 20px var(--neu-dark), -5px -5px 14px var(--neu-light)`,
 }
 
-const glass: React.CSSProperties = {
-  background: 'var(--glass-bg)',
-  border: '1px solid var(--glass-border)',
-  backdropFilter: 'blur(24px) saturate(1.5)',
-  WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+// Glassmorphism panel (usato sull'aside)
+const glassSidebar: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.06)',
+  backdropFilter: 'blur(28px) saturate(1.6)',
+  WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+  borderRight: '1px solid rgba(255,255,255,0.10)',
+}
+
+// Glassmorphism leggero per gli item attivi
+const glassItem: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.10)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '1px solid rgba(255,255,255,0.14)',
 }
 
 interface SidebarProps {
@@ -38,9 +47,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open = true, onClose }: SidebarProps) {
-  const location  = useLocation()
-  const navigate  = useNavigate()
-  const { t }     = useLanguage()
+  const location   = useLocation()
+  const navigate   = useNavigate()
+  const { t }      = useLanguage()
   const { logout } = useAuthStore()
   const [collapsed, setCollapsed] = useState(false)
 
@@ -62,7 +71,7 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
       <div
         onClick={onClose}
         style={{
-          display: 'none', // visibile solo su mobile via media query — gestito sotto
+          display: 'none',
           position: 'fixed', inset: 0,
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(4px)',
@@ -72,7 +81,7 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
       />
 
       <aside style={{
-        ...glass,
+        ...glassSidebar,
         position: 'relative',
         width: W,
         minWidth: W,
@@ -96,14 +105,16 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
           gap: 12,
           paddingBottom: 20,
           marginBottom: 12,
-          borderBottom: '1px solid var(--glass-border)',
+          borderBottom: '1px solid rgba(255,255,255,0.10)',
         }}>
           {!collapsed && (
             <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-              {/* Logo neumorfico */}
               <div style={{
                 width: 38, height: 38, borderRadius: 13,
-                background: 'var(--bg)',
+                background: 'rgba(255,255,255,0.10)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.16)',
                 boxShadow: neu.outset,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 800, letterSpacing: '0.04em',
@@ -118,12 +129,14 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
             </Link>
           )}
 
-          {/* Toggle collapse */}
           <button
             onClick={() => setCollapsed(c => !c)}
             style={{
               width: 32, height: 32, borderRadius: 10,
-              background: 'var(--bg)', border: 'none',
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.12)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
               color: 'var(--text-muted)',
@@ -135,18 +148,15 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
             onMouseUp={e => (e.currentTarget.style.boxShadow = neu.outset)}
             onMouseLeave={e => (e.currentTarget.style.boxShadow = neu.outset)}
           >
-            {collapsed
-              ? <ChevronRight size={14} />
-              : <ChevronLeft size={14} />
-            }
+            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
         </div>
 
         {/* ── Nav items ── */}
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8, paddingBottom: 8 }}>
           {menuItems.map(item => {
-            const Icon    = item.icon
-            const active  = isActive(item.path)
+            const Icon   = item.icon
+            const active = isActive(item.path)
             return (
               <Link
                 key={item.path}
@@ -162,25 +172,41 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
                   height: 48,
                   borderRadius: 999,
                   padding: collapsed ? 0 : '0 16px',
-                  background: 'var(--bg)',
-                  boxShadow: active ? neu.inset : neu.outset,
                   cursor: 'pointer',
-                  transition: 'box-shadow 0.2s',
+                  transition: 'box-shadow 0.2s, background 0.2s',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
+                  /* Glass sull'item attivo, neumorfico sugli altri */
+                  ...(active
+                    ? { ...glassItem, boxShadow: neu.inset }
+                    : { background: 'rgba(255,255,255,0.03)', border: '1px solid transparent', boxShadow: neu.outset }
+                  ),
                 }}
-                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLDivElement).style.boxShadow = neu.outsetHover }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = active ? neu.inset : neu.outset }}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      const el = e.currentTarget as HTMLDivElement
+                      el.style.boxShadow = neu.outsetHover
+                      el.style.background = 'rgba(255,255,255,0.06)'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLDivElement
+                    el.style.boxShadow = active ? neu.inset : neu.outset
+                    el.style.background = active ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.03)'
+                  }}
                 >
                   {/* Icon circle */}
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%',
                     flexShrink: 0,
-                    background: 'var(--bg)',
+                    background: active ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    border: `1px solid ${active ? 'rgba(255,255,255,0.18)' : 'transparent'}`,
                     boxShadow: active ? neu.outset : neu.insetSm,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     color: active ? 'var(--accent)' : 'var(--text-muted)',
-                    transition: 'box-shadow 0.2s, color 0.2s',
+                    transition: 'box-shadow 0.2s, color 0.2s, background 0.2s',
                   }}>
                     <Icon size={13} />
                   </div>
@@ -202,7 +228,7 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
         </nav>
 
         {/* ── Logout ── */}
-        <div style={{ paddingTop: 20, borderTop: '1px solid var(--glass-border)' }}>
+        <div style={{ paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.10)' }}>
           <button
             onClick={handleLogout}
             style={{
@@ -214,11 +240,13 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
               height: 48,
               borderRadius: 999,
               padding: collapsed ? 0 : '0 16px',
-              background: 'var(--bg)',
-              border: 'none',
+              background: 'rgba(255,255,255,0.05)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.10)',
               boxShadow: neu.outset,
               cursor: 'pointer',
-              transition: 'box-shadow 0.2s',
+              transition: 'box-shadow 0.2s, background 0.2s',
               overflow: 'hidden',
               whiteSpace: 'nowrap',
             }}
@@ -229,7 +257,10 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
               flexShrink: 0,
-              background: 'var(--bg)',
+              background: 'rgba(239,68,68,0.12)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(239,68,68,0.20)',
               boxShadow: neu.insetSm,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#ef4444',

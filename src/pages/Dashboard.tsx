@@ -19,16 +19,17 @@ const neu = {
   panel:   `8px 8px 20px var(--neu-dark), -5px -5px 14px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.2)`,
 }
 
-const glass: React.CSSProperties = {
-  background: 'var(--glass-bg)',
-  border: '1px solid var(--glass-border)',
-  backdropFilter: 'blur(24px) saturate(1.5)',
-  WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
-}
-
-function NeuPanel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function GlassPanel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ ...glass, borderRadius: 24, padding: '28px 26px', boxShadow: neu.panel, ...style }}>
+    <div style={{
+      background: 'rgba(255,255,255,0.07)',
+      border: '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(24px) saturate(1.5)',
+      WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+      borderRadius: 24, padding: '28px 26px',
+      boxShadow: neu.panel,
+      ...style,
+    }}>
       {children}
     </div>
   )
@@ -38,7 +39,16 @@ function PanelTitle({ icon: Icon, children }: { icon?: any; children: React.Reac
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 26 }}>
       {Icon && (
-        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', flexShrink: 0 }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.08)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.14)',
+          boxShadow: neu.outset,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--accent)', flexShrink: 0,
+        }}>
           <Icon size={15} />
         </div>
       )}
@@ -52,9 +62,9 @@ function PanelTitle({ icon: Icon, children }: { icon?: any; children: React.Reac
 export function Dashboard() {
   const { clienti, opportunita, attivita, getTotalRevenue, getTotalPipeline, getClientiByStatus } = useCRMStore()
 
-  const activeClients    = getClientiByStatus('Attivo').length
-  const totalRevenue     = getTotalRevenue()
-  const totalPipeline    = getTotalPipeline()
+  const activeClients      = getClientiByStatus('Attivo').length
+  const totalRevenue       = getTotalRevenue()
+  const totalPipeline      = getTotalPipeline()
   const opportunitiesCount = opportunita.length
 
   const [date, setDate] = useState<CalendarValue>(new Date())
@@ -79,9 +89,8 @@ export function Dashboard() {
 
   const getWeekEvents = () => {
     const today = new Date()
-    const start = new Date(today)
-    start.setDate(today.getDate() - today.getDay() + 1)
-    const end = new Date(start); end.setDate(start.getDate() + 6)
+    const start = new Date(today); start.setDate(today.getDate() - today.getDay() + 1)
+    const end   = new Date(start); end.setDate(start.getDate() + 6)
     const weekEvents: Array<{ date: string; title: string; type: string }> = []
     Object.keys(eventsByDate).forEach(key => {
       const d = new Date(key)
@@ -92,8 +101,8 @@ export function Dashboard() {
   }
 
   const weeklyEvents = getWeekEvents()
-  const timeline = attivita.map(a => ({ date: a.date, title: a.title, type: a.type })).sort((a, b) => a.date.localeCompare(b.date))
-  const upcoming = attivita.filter(a => {
+  const timeline  = attivita.map(a => ({ date: a.date, title: a.title, type: a.type })).sort((a, b) => a.date.localeCompare(b.date))
+  const upcoming  = attivita.filter(a => {
     const diff = (new Date(a.date).getTime() - Date.now()) / 86400000
     return diff >= 0 && diff <= 7
   })
@@ -114,10 +123,10 @@ export function Dashboard() {
   const colors = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4']
 
   const kpis = [
-    { icon: Users,       label: 'CLIENTI ATTIVI',  value: activeClients },
-    { icon: Target,      label: 'OPPORTUNITÀ',     value: opportunitiesCount },
-    { icon: DollarSign,  label: 'RICAVI TOTALI',   value: `€${totalRevenue.toLocaleString()}` },
-    { icon: TrendingUp,  label: 'PIPELINE',        value: `€${totalPipeline.toLocaleString()}` },
+    { icon: Users,      label: 'CLIENTI ATTIVI', value: activeClients },
+    { icon: Target,     label: 'OPPORTUNITÀ',    value: opportunitiesCount },
+    { icon: DollarSign, label: 'RICAVI TOTALI',  value: `€${totalRevenue.toLocaleString()}` },
+    { icon: TrendingUp, label: 'PIPELINE',       value: `€${totalPipeline.toLocaleString()}` },
   ]
 
   return (
@@ -125,21 +134,38 @@ export function Dashboard() {
 
       <style>{`
         .react-calendar { background: transparent !important; border: none !important; width: 100% !important; font-family: inherit !important; }
-        .react-calendar__tile { background: var(--bg) !important; border-radius: 10px !important; color: var(--text) !important; box-shadow: ${neu.outset}; margin: 2px !important; font-size: 11px !important; font-weight: 600 !important; }
-        .react-calendar__tile--active { box-shadow: ${neu.inset} !important; color: var(--accent) !important; }
+        .react-calendar__tile { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 10px !important; color: var(--text) !important; box-shadow: ${neu.outset}; margin: 2px !important; font-size: 11px !important; font-weight: 600 !important; backdrop-filter: blur(6px); }
+        .react-calendar__tile--active { background: rgba(99,102,241,0.15) !important; border-color: rgba(99,102,241,0.25) !important; box-shadow: ${neu.inset} !important; color: var(--accent) !important; }
         .react-calendar__tile.has-event::after { content: ''; display: block; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; margin: 2px auto 0; }
-        .react-calendar__navigation button { background: var(--bg) !important; border-radius: 10px !important; color: var(--text) !important; box-shadow: ${neu.outset}; font-weight: 700 !important; font-size: 12px !important; }
+        .react-calendar__navigation button { background: rgba(255,255,255,0.07) !important; border: 1px solid rgba(255,255,255,0.12) !important; border-radius: 10px !important; color: var(--text) !important; box-shadow: ${neu.outset}; font-weight: 700 !important; font-size: 12px !important; backdrop-filter: blur(8px); }
         .react-calendar__month-view__weekdays__weekday { color: var(--text-muted) !important; font-size: 10px !important; font-weight: 700 !important; letter-spacing: 0.1em !important; }
         .react-calendar__month-view__weekdays__weekday abbr { text-decoration: none !important; }
       `}</style>
 
       <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text)', marginBottom: 8 }}>DASHBOARD</h1>
 
-      {/* KPI */}
+      {/* KPI — glass card con luce accent */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
         {kpis.map(({ icon: Icon, label, value }) => (
-          <div key={label} style={{ background: 'var(--bg)', borderRadius: 22, padding: '26px 22px', boxShadow: neu.outset, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.inset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+          <div key={label} style={{
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            backdropFilter: 'blur(20px) saturate(1.5)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
+            borderRadius: 22, padding: '26px 22px',
+            boxShadow: neu.panel,
+            display: 'flex', flexDirection: 'column', gap: 20,
+          }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: 'rgba(99,102,241,0.12)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(99,102,241,0.22)',
+              boxShadow: neu.inset,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--accent)',
+            }}>
               <Icon size={17} />
             </div>
             <div>
@@ -152,95 +178,95 @@ export function Dashboard() {
 
       {/* Grafici */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        <NeuPanel>
+        <GlassPanel>
           <PanelTitle icon={TrendingUp}>TREND REVENUE</PanelTitle>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
               <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 11, fontWeight: 600 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'var(--bg)', border: '1px solid var(--glass-border)', borderRadius: 12, color: 'var(--text)', fontSize: 12 }} />
+              <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: 'var(--text)', fontSize: 12 }} />
               <Line type="monotone" dataKey="value" stroke="var(--accent)" strokeWidth={3} dot={{ fill: 'var(--accent)', r: 4, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
-        </NeuPanel>
+        </GlassPanel>
 
-        <NeuPanel>
+        <GlassPanel>
           <PanelTitle icon={Target}>PIPELINE OPPORTUNITÀ</PanelTitle>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={stageData} dataKey="value" nameKey="name" outerRadius={90} innerRadius={40}>
                 {stageData.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}
               </Pie>
-              <Tooltip contentStyle={{ background: 'var(--bg)', border: '1px solid var(--glass-border)', borderRadius: 12, color: 'var(--text)', fontSize: 12 }} />
+              <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: 'var(--text)', fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
-        </NeuPanel>
+        </GlassPanel>
       </div>
 
       {/* Calendario + Agenda */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        <NeuPanel>
+        <GlassPanel>
           <PanelTitle icon={CalendarDays}>CALENDARIO</PanelTitle>
           <Calendar onChange={v => setDate(v as CalendarValue)} value={date} tileClassName={tileClassName} />
           {eventsForSelectedDay.length > 0 && (
             <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
               <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text-muted)', marginBottom: 4 }}>EVENTI DEL GIORNO</p>
               {eventsForSelectedDay.map((ev, i) => (
-                <div key={i} style={{ background: 'var(--bg)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm }}>
+                <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
                   <p style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', marginTop: 2 }}>{ev.type.toUpperCase()}</p>
                 </div>
               ))}
             </div>
           )}
-        </NeuPanel>
+        </GlassPanel>
 
-        <NeuPanel>
+        <GlassPanel>
           <PanelTitle icon={CalendarDays}>AGENDA SETTIMANALE</PanelTitle>
           {weeklyEvents.length === 0
             ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nessun evento questa settimana</p>
             : <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {weeklyEvents.map((ev, i) => (
-                  <div key={i} style={{ background: 'var(--bg)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm }}>
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm }}>
                     <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
                     <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 7 }}>{ev.date} · {ev.type}</p>
                   </div>
                 ))}
               </div>
           }
-        </NeuPanel>
+        </GlassPanel>
       </div>
 
       {/* Timeline + Imminenti */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        <NeuPanel>
+        <GlassPanel>
           <PanelTitle icon={Clock}>TIMELINE ATTIVITÀ</PanelTitle>
-          <div style={{ borderLeft: '2px solid var(--glass-border)', marginLeft: 10, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 22 }}>
+          <div style={{ borderLeft: '2px solid rgba(255,255,255,0.12)', marginLeft: 10, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 22 }}>
             {timeline.map((ev, i) => (
               <div key={i} style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: -25, top: 4, width: 12, height: 12, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, border: '2px solid var(--accent)' }} />
+                <div style={{ position: 'absolute', left: -25, top: 4, width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', boxShadow: neu.outset, border: '2px solid var(--accent)' }} />
                 <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
                 <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 7 }}>{ev.date} · {ev.type}</p>
               </div>
             ))}
           </div>
-        </NeuPanel>
+        </GlassPanel>
 
-        <NeuPanel>
+        <GlassPanel>
           <PanelTitle>ATTIVITÀ IMMINENTI (7 GIORNI)</PanelTitle>
           {upcoming.length === 0
             ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nessuna attività imminente</p>
             : <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {upcoming.map((ev, i) => (
-                  <div key={i} style={{ background: 'var(--bg)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm, borderLeft: '3px solid var(--accent)' }}>
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 12, padding: '14px 18px', boxShadow: neu.insetSm, borderLeft: '3px solid var(--accent)' }}>
                     <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title}</p>
                     <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 7 }}>{ev.date} · {ev.type}</p>
                   </div>
                 ))}
               </div>
           }
-        </NeuPanel>
+        </GlassPanel>
       </div>
     </div>
   )

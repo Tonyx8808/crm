@@ -1,19 +1,23 @@
-import { Bell, Search, Menu, Moon, Sun } from 'lucide-react'
+import { Bell, Search, Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useState } from 'react'
 
 const neu = {
-  outset:  `4px 4px 10px var(--neu-dark), -2px -2px 7px var(--neu-light)`,
-  inset:   `inset 3px 3px 7px var(--neu-dark), inset -2px -2px 4px var(--neu-light)`,
-  panel:   `6px 6px 16px var(--neu-dark), -4px -4px 10px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.15)`,
+  outset: `4px 4px 10px var(--neu-dark), -2px -2px 7px var(--neu-light)`,
+  inset:  `inset 3px 3px 7px var(--neu-dark), inset -2px -2px 4px var(--neu-light)`,
+  panel:  `6px 6px 16px var(--neu-dark), -4px -4px 10px var(--neu-light)`,
 }
 
 const glass: React.CSSProperties = {
-  background: 'var(--glass-bg)',
-  border: '1px solid var(--glass-border)',
-  backdropFilter: 'blur(20px) saturate(1.4)',
-  WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderTop: 'none',
+  borderLeft: 'none',
+  borderRight: 'none',
+  borderBottom: '1px solid rgba(255,255,255,0.10)',
+  backdropFilter: 'blur(24px) saturate(1.6)',
+  WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
 }
 
 function IconBtn({ onClick, children, title }: { onClick?: () => void; children: React.ReactNode; title?: string }) {
@@ -27,8 +31,10 @@ function IconBtn({ onClick, children, title }: { onClick?: () => void; children:
       onMouseLeave={() => setPressed(false)}
       style={{
         width: 38, height: 38,
-        background: 'var(--bg)',
-        border: 'none',
+        background: 'rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255,255,255,0.14)',
         borderRadius: 12,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer',
@@ -67,15 +73,16 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
       {/* Left: search */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
-
-        {/* Search neumorfica inset */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: 10,
           flex: 1,
           maxWidth: 380,
-          background: 'var(--bg)',
+          background: 'rgba(255,255,255,0.06)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.12)',
           borderRadius: 999,
           padding: '8px 16px',
           boxShadow: neu.inset,
@@ -101,22 +108,23 @@ export function Navbar({ onMenuClick }: NavbarProps) {
       {/* Right: actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 
-        {/* Notifiche */}
         <IconBtn title="Notifiche">
           <Bell size={17} />
         </IconBtn>
 
-        {/* Tema */}
         <IconBtn onClick={toggleTheme} title="Cambia tema">
           {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
         </IconBtn>
 
-        {/* Lingua — pill IT/EN neumorfica */}
+        {/* Lingua pill */}
         <div style={{
           display: 'flex',
           borderRadius: 999,
           overflow: 'hidden',
-          background: 'var(--bg)',
+          background: 'rgba(255,255,255,0.06)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.12)',
           boxShadow: neu.inset,
         }}>
           {(['it', 'en'] as const).map(l => (
@@ -131,10 +139,12 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 cursor: 'pointer',
-                background: language === l ? 'var(--bg)' : 'transparent',
+                background: language === l
+                  ? 'rgba(255,255,255,0.14)'
+                  : 'transparent',
                 color: language === l ? 'var(--accent)' : 'var(--text-muted)',
                 boxShadow: language === l ? neu.outset : 'none',
-                transition: 'box-shadow 0.2s, color 0.2s',
+                transition: 'box-shadow 0.2s, color 0.2s, background 0.2s',
               }}
             >
               {l.toUpperCase()}

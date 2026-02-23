@@ -12,12 +12,12 @@ const neu = {
 }
 
 export function LoginPage() {
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
   const { login, isLoading } = useAuthStore()
   const [username, setUsername] = useState('user')
   const [password, setPassword] = useState('user')
-  const [showPw, setShowPw] = useState(false)
-  const [error, setError] = useState('')
+  const [showPw,   setShowPw]   = useState(false)
+  const [error,    setError]    = useState('')
   const [btnPressed, setBtnPressed] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,16 +32,16 @@ export function LoginPage() {
     <div style={{
       minHeight: '100vh',
       background: 'var(--bg)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 24,
     }}>
-      {/* Card neumorfica */}
+      {/* Card glass */}
       <div style={{
-        width: '100%',
-        maxWidth: 400,
-        background: 'var(--bg)',
+        width: '100%', maxWidth: 400,
+        background: 'rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(32px) saturate(1.7)',
+        WebkitBackdropFilter: 'blur(32px) saturate(1.7)',
         borderRadius: 32,
         padding: '44px 36px',
         boxShadow: neu.panel,
@@ -50,9 +50,11 @@ export function LoginPage() {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
-            width: 64, height: 64,
-            borderRadius: 20,
-            background: 'var(--bg)',
+            width: 64, height: 64, borderRadius: 20,
+            background: 'rgba(99,102,241,0.12)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(99,102,241,0.25)',
             boxShadow: neu.outset,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 18px',
@@ -61,12 +63,8 @@ export function LoginPage() {
           }}>
             CRM
           </div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '0.2em', color: 'var(--text)', marginBottom: 8 }}>
-            CRM PRO
-          </h1>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-            Accedi al tuo account
-          </p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '0.2em', color: 'var(--text)', marginBottom: 8 }}>CRM PRO</h1>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.12em' }}>Accedi al tuo account</p>
         </div>
 
         {/* Form */}
@@ -79,7 +77,16 @@ export function LoginPage() {
               value={username}
               onChange={e => setUsername(e.target.value)}
               placeholder="user"
-              style={{ width: '100%', background: 'var(--bg)', border: 'none', borderRadius: 14, padding: '13px 18px', fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', color: 'var(--text)', outline: 'none', boxShadow: neu.inset }}
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 14, padding: '13px 18px',
+                fontSize: 13, fontWeight: 500, letterSpacing: '0.06em',
+                color: 'var(--text)', outline: 'none',
+                boxShadow: neu.inset,
+              }}
             />
           </div>
 
@@ -92,7 +99,16 @@ export function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="user"
-                style={{ width: '100%', background: 'var(--bg)', border: 'none', borderRadius: 14, padding: '13px 48px 13px 18px', fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', color: 'var(--text)', outline: 'none', boxShadow: neu.inset }}
+                style={{
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.06)',
+                  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 14, padding: '13px 48px 13px 18px',
+                  fontSize: 13, fontWeight: 500, letterSpacing: '0.06em',
+                  color: 'var(--text)', outline: 'none',
+                  boxShadow: neu.inset,
+                }}
               />
               <button
                 type="button"
@@ -106,7 +122,7 @@ export function LoginPage() {
 
           {/* Error */}
           {error && (
-            <p style={{ fontSize: 12, color: '#ef4444', letterSpacing: '0.06em', padding: '8px 14px', borderRadius: 10, background: 'rgba(239,68,68,0.08)' }}>
+            <p style={{ fontSize: 12, color: '#ef4444', letterSpacing: '0.06em', padding: '8px 14px', borderRadius: 10, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.18)' }}>
               {error}
             </p>
           )}
@@ -120,8 +136,9 @@ export function LoginPage() {
             onMouseLeave={() => setBtnPressed(false)}
             style={{
               marginTop: 8,
-              background: 'var(--bg)',
-              border: 'none',
+              background: btnPressed ? 'rgba(99,102,241,0.18)' : 'rgba(99,102,241,0.10)',
+              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(99,102,241,0.25)',
               borderRadius: 999,
               padding: '13px 22px',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -129,7 +146,7 @@ export function LoginPage() {
               color: btnPressed ? 'var(--accent)' : 'var(--text)',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               boxShadow: btnPressed ? neu.inset : neu.outset,
-              transition: 'box-shadow 0.15s, color 0.15s',
+              transition: 'box-shadow 0.15s, color 0.15s, background 0.15s',
               opacity: isLoading ? 0.7 : 1,
             }}
           >
@@ -138,7 +155,6 @@ export function LoginPage() {
           </button>
         </form>
 
-        {/* Demo hint */}
         <p style={{ textAlign: 'center', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.14em', marginTop: 24 }}>
           DEMO · user / user
         </p>

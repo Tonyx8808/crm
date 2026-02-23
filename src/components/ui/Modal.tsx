@@ -24,23 +24,28 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       position: 'fixed', inset: 0, zIndex: 50,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      {/* backdrop */}
+      {/* backdrop con blur forte */}
       <div
         onClick={onClose}
         style={{
           position: 'absolute', inset: 0,
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(12px) saturate(1.2)',
+          WebkitBackdropFilter: 'blur(12px) saturate(1.2)',
         }}
       />
 
-      {/* pannello */}
+      {/* pannello glass */}
       <div style={{
         position: 'relative',
         width: '100%',
         maxWidth: 440,
         margin: '0 16px',
-        background: 'var(--bg)',
+        /* glass */
+        background: 'rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(32px) saturate(1.7)',
+        WebkitBackdropFilter: 'blur(32px) saturate(1.7)',
         borderRadius: 28,
         padding: '28px 26px',
         boxShadow: neu.panel,
@@ -49,7 +54,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 22, paddingBottom: 16,
-          borderBottom: '1px solid var(--glass-border)',
+          borderBottom: '1px solid rgba(255,255,255,0.10)',
         }}>
           <h2 style={{
             fontSize: 14, fontWeight: 700,
@@ -66,7 +71,10 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             onMouseLeave={() => setBtnPressed(false)}
             style={{
               width: 32, height: 32, borderRadius: '50%',
-              background: 'var(--bg)', border: 'none',
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.14)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
               color: 'var(--text-muted)',

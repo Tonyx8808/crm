@@ -35,7 +35,11 @@ export function Toast({ type, message, onClose }: ToastProps) {
       gap: 12,
       padding: '12px 16px',
       borderRadius: 16,
-      background: 'var(--bg)',
+      /* glass */
+      background: 'rgba(255,255,255,0.08)',
+      border: '1px solid rgba(255,255,255,0.14)',
+      backdropFilter: 'blur(24px) saturate(1.6)',
+      WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
       boxShadow: neu.outset,
       minWidth: 280,
       maxWidth: 400,
@@ -43,10 +47,13 @@ export function Toast({ type, message, onClose }: ToastProps) {
     }}>
       <style>{`@keyframes toastIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }`}</style>
 
-      {/* icon circle */}
+      {/* icon circle glass colorato */}
       <div style={{
         width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-        background: 'var(--bg)',
+        background: `color-mix(in srgb, ${color} 14%, transparent)`,
+        border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         boxShadow: neu.insetSm,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         color,
@@ -65,7 +72,10 @@ export function Toast({ type, message, onClose }: ToastProps) {
         onMouseLeave={() => setPressed(false)}
         style={{
           width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-          background: 'var(--bg)', border: 'none',
+          background: 'rgba(255,255,255,0.07)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255,255,255,0.12)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer',
           color: 'var(--text-muted)',

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuthStore } from '@/stores/authStore'
-import { Moon, Sun, Globe, Lock, Bell, Shield, LogOut, Save, Eye, EyeOff, Check, AlertCircle } from 'lucide-react'
+import { Moon, Globe, Lock, Bell, Shield, LogOut, Save, Eye, EyeOff, Check, AlertCircle } from 'lucide-react'
 
 const neu = {
   outset:  `5px 5px 14px var(--neu-dark), -3px -3px 9px var(--neu-light)`,
@@ -13,19 +13,19 @@ const neu = {
   insetSm: `inset 2px 2px 5px var(--neu-dark), inset -1px -1px 3px var(--neu-light)`,
   panel:   `8px 8px 20px var(--neu-dark), -5px -5px 14px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.2)`,
 }
-const glass: React.CSSProperties = {
-  background: 'var(--glass-bg)',
-  border: '1px solid var(--glass-border)',
-  backdropFilter: 'blur(24px) saturate(1.5)',
-  WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
-}
 
-/* ── componenti base ── */
 function Section({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
   return (
-    <div style={{ ...glass, borderRadius: 24, padding: '28px 26px', boxShadow: neu.panel }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: '1px solid var(--glass-border)' }}>
-        <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', flexShrink: 0 }}>
+    <div style={{
+      background: 'rgba(255,255,255,0.07)',
+      border: '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(24px) saturate(1.5)',
+      WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+      borderRadius: 24, padding: '28px 26px',
+      boxShadow: neu.panel,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.10)' }}>
+        <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.14)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)', flexShrink: 0 }}>
           <Icon size={15} />
         </div>
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text)' }}>{title}</span>
@@ -37,13 +37,13 @@ function Section({ icon: Icon, title, children }: { icon: any; title: string; ch
 
 function InfoRow({ label, value, badge }: { label: string; value?: string; badge?: { text: string; color: string } }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', boxShadow: neu.insetSm, marginBottom: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 14, padding: '14px 18px', boxShadow: neu.insetSm, marginBottom: 10 }}>
       <div>
         <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'var(--text-muted)', marginBottom: 3 }}>{label.toUpperCase()}</p>
         {value && <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{value}</p>}
       </div>
       {badge && (
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '4px 12px', borderRadius: 999, background: 'var(--bg)', boxShadow: neu.outset, color: badge.color }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '4px 12px', borderRadius: 999, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', boxShadow: neu.outset, color: badge.color }}>
           {badge.text.toUpperCase()}
         </span>
       )}
@@ -51,30 +51,28 @@ function InfoRow({ label, value, badge }: { label: string; value?: string; badge
   )
 }
 
-function NeuBtn({ onClick, children, danger, outline }: { onClick?: () => void; children: React.ReactNode; danger?: boolean; outline?: boolean }) {
+function NeuBtn({ onClick, children, danger }: { onClick?: () => void; children: React.ReactNode; danger?: boolean }) {
   const [pressed, setPressed] = useState(false)
   return (
-    <button
-      onClick={onClick}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
-      onMouseLeave={() => setPressed(false)}
+    <button onClick={onClick} onMouseDown={() => setPressed(true)} onMouseUp={() => setPressed(false)} onMouseLeave={() => setPressed(false)}
       style={{
-        background: 'var(--bg)', border: 'none', borderRadius: 999,
-        padding: '10px 22px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        background: danger ? 'rgba(239,68,68,0.08)' : 'rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        border: danger ? '1px solid rgba(239,68,68,0.20)' : '1px solid rgba(255,255,255,0.12)',
+        borderRadius: 999, padding: '10px 22px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
         fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', cursor: 'pointer',
         color: danger ? '#ef4444' : pressed ? 'var(--accent)' : 'var(--text)',
         boxShadow: pressed ? neu.inset : neu.outset,
         transition: 'box-shadow 0.15s, color 0.15s',
         width: '100%',
-      }}
-    >
+      }}>
       {children}
     </button>
   )
 }
 
-function NeuInput({ type = 'text', value, onChange, placeholder, label, rightIcon }: {
+function GlassInput({ type = 'text', value, onChange, placeholder, label, rightIcon }: {
   type?: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   placeholder?: string; label?: string; rightIcon?: React.ReactNode
 }) {
@@ -84,7 +82,17 @@ function NeuInput({ type = 'text', value, onChange, placeholder, label, rightIco
       <div style={{ position: 'relative' }}>
         <input
           type={type} value={value} onChange={onChange} placeholder={placeholder}
-          style={{ width: '100%', background: 'var(--bg)', border: 'none', borderRadius: 14, padding: rightIcon ? '11px 44px 11px 18px' : '11px 18px', fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', color: 'var(--text)', outline: 'none', boxShadow: neu.inset }}
+          style={{
+            width: '100%',
+            background: 'rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 14,
+            padding: rightIcon ? '11px 44px 11px 18px' : '11px 18px',
+            fontSize: 13, fontWeight: 500, letterSpacing: '0.06em',
+            color: 'var(--text)', outline: 'none',
+            boxShadow: neu.inset,
+          }}
         />
         {rightIcon && (
           <div style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
@@ -96,27 +104,40 @@ function NeuInput({ type = 'text', value, onChange, placeholder, label, rightIco
   )
 }
 
-/* ── switch neumorfico ── */
-function NeuSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+function GlassSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
   return (
-    <div onClick={onChange} style={{ position: 'relative', width: 54, height: 28, borderRadius: 14, background: 'var(--bg)', cursor: 'pointer', flexShrink: 0, boxShadow: checked ? neu.inset : neu.outset, transition: 'box-shadow 0.25s' }}>
-      <div style={{ position: 'absolute', top: 4, left: checked ? 30 : 4, width: 20, height: 20, borderRadius: '50%', background: checked ? 'var(--accent)' : 'var(--text-muted)', transition: 'left 0.25s, background 0.25s', boxShadow: '1px 1px 4px rgba(0,0,0,0.3)' }} />
+    <div onClick={onChange} style={{
+      position: 'relative', width: 54, height: 28, borderRadius: 14,
+      background: checked ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.06)',
+      border: checked ? '1px solid rgba(99,102,241,0.25)' : '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+      cursor: 'pointer', flexShrink: 0,
+      boxShadow: checked ? neu.inset : neu.outset,
+      transition: 'box-shadow 0.25s, background 0.25s, border-color 0.25s',
+    }}>
+      <div style={{ position: 'absolute', top: 4, left: checked ? 30 : 4, width: 20, height: 20, borderRadius: '50%', background: checked ? 'var(--accent)' : 'rgba(255,255,255,0.35)', backdropFilter: 'blur(6px)', transition: 'left 0.25s, background 0.25s', boxShadow: '1px 1px 4px rgba(0,0,0,0.25)' }} />
     </div>
   )
 }
 
-/* ── checkbox neumorfica ── */
-function NeuCheck({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+function GlassCheck({ checked, onChange }: { checked: boolean; onChange: () => void }) {
   return (
-    <div onClick={onChange} style={{ width: 22, height: 22, borderRadius: 7, background: 'var(--bg)', cursor: 'pointer', flexShrink: 0, boxShadow: checked ? neu.inset : neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'box-shadow 0.2s', color: checked ? 'var(--accent)' : 'transparent', fontSize: 13 }}>
+    <div onClick={onChange} style={{
+      width: 22, height: 22, borderRadius: 7,
+      background: checked ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.06)',
+      border: checked ? '1px solid rgba(99,102,241,0.25)' : '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+      cursor: 'pointer', flexShrink: 0,
+      boxShadow: checked ? neu.inset : neu.outset,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      transition: 'box-shadow 0.2s, background 0.2s',
+      color: checked ? 'var(--accent)' : 'transparent',
+    }}>
       {checked && <Check size={13} />}
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════
-   COMPONENTE PRINCIPALE
-   ═══════════════════════════════════════════ */
 export function Impostazioni() {
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
@@ -125,20 +146,20 @@ export function Impostazioni() {
 
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
+  const [newPassword,     setNewPassword]     = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showCurrent, setShowCurrent] = useState(false)
-  const [showNew, setShowNew] = useState(false)
+  const [showNew,     setShowNew]     = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [pwMsg, setPwMsg] = useState('')
   const [pwErr, setPwErr] = useState('')
 
   const [notifications, setNotifications] = useState({ email: true, sms: false, push: true, newsletter: true })
-  const [privacy, setPrivacy] = useState({ profileVisible: true, activityVisible: false, emailPublic: false })
+  const [privacy,       setPrivacy]       = useState({ profileVisible: true, activityVisible: false, emailPublic: false })
   const [sessions] = useState([
-    { id: '1', device: 'Windows PC', browser: 'Chrome', location: 'Milano, IT', lastActive: '2 min fa', current: true },
-    { id: '2', device: 'iPhone 12', browser: 'Safari', location: 'Roma, IT', lastActive: '2 ore fa', current: false },
-    { id: '3', device: 'MacBook Pro', browser: 'Firefox', location: 'Torino, IT', lastActive: '1 giorno fa', current: false },
+    { id: '1', device: 'Windows PC',   browser: 'Chrome',  location: 'Milano, IT', lastActive: '2 min fa',   current: true  },
+    { id: '2', device: 'iPhone 12',    browser: 'Safari',  location: 'Roma, IT',   lastActive: '2 ore fa',   current: false },
+    { id: '3', device: 'MacBook Pro',  browser: 'Firefox', location: 'Torino, IT', lastActive: '1 giorno fa',current: false },
   ])
 
   const handleChangePassword = () => {
@@ -163,9 +184,9 @@ export function Impostazioni() {
 
       {/* Account */}
       <Section icon={Shield} title="INFORMAZIONI ACCOUNT">
-        <InfoRow label="Nome Utente" value={user?.name} badge={{ text: 'Verificato', color: '#10b981' }} />
-        <InfoRow label="Email" value={user?.email} badge={{ text: 'Confermata', color: '#10b981' }} />
-        <InfoRow label="Ruolo" value={user?.id === '1' ? 'Amministratore' : 'Utente'} badge={{ text: 'Admin', color: 'var(--accent)' }} />
+        <InfoRow label="Nome Utente" value={user?.name}  badge={{ text: 'Verificato', color: '#10b981' }} />
+        <InfoRow label="Email"       value={user?.email} badge={{ text: 'Confermata', color: '#10b981' }} />
+        <InfoRow label="Ruolo"       value={user?.id === '1' ? 'Amministratore' : 'Utente'} badge={{ text: 'Admin', color: 'var(--accent)' }} />
       </Section>
 
       {/* Password */}
@@ -174,15 +195,15 @@ export function Impostazioni() {
           <NeuBtn onClick={() => setShowPasswordForm(true)}><Lock size={13} /> CAMBIA PASSWORD</NeuBtn>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <NeuInput type={showCurrent ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Password attuale" label="Password attuale"
+            <GlassInput type={showCurrent ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Password attuale" label="Password attuale"
               rightIcon={<span onClick={() => setShowCurrent(!showCurrent)}>{showCurrent ? <EyeOff size={15} /> : <Eye size={15} />}</span>} />
-            <NeuInput type={showNew ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Nuova password" label="Nuova password"
+            <GlassInput type={showNew ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Nuova password" label="Nuova password"
               rightIcon={<span onClick={() => setShowNew(!showNew)}>{showNew ? <EyeOff size={15} /> : <Eye size={15} />}</span>} />
-            <NeuInput type={showConfirm ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Conferma password" label="Conferma password"
+            <GlassInput type={showConfirm ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Conferma password" label="Conferma password"
               rightIcon={<span onClick={() => setShowConfirm(!showConfirm)}>{showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}</span>} />
 
-            {pwErr && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#ef4444', fontSize: 12 }}><AlertCircle size={13} />{pwErr}</div>}
-            {pwMsg && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, background: 'rgba(16,185,129,0.08)', color: '#10b981', fontSize: 12 }}><Check size={13} />{pwMsg}</div>}
+            {pwErr && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.18)', color: '#ef4444', fontSize: 12 }}><AlertCircle size={13} />{pwErr}</div>}
+            {pwMsg && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.18)', color: '#10b981', fontSize: 12 }}><Check size={13} />{pwMsg}</div>}
 
             <div style={{ display: 'flex', gap: 10 }}>
               <NeuBtn onClick={handleChangePassword}><Save size={13} /> SALVA</NeuBtn>
@@ -196,21 +217,17 @@ export function Impostazioni() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <Section icon={Moon} title="TEMA">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-              {theme === 'dark' ? '🌙 Scura' : '☀️ Chiara'}
-            </span>
-            <NeuSwitch checked={theme === 'dark'} onChange={toggleTheme} />
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{theme === 'dark' ? '🌙 Scura' : '☀️ Chiara'}</span>
+            <GlassSwitch checked={theme === 'dark'} onChange={toggleTheme} />
           </div>
         </Section>
         <Section icon={Globe} title="LINGUA">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-              {language === 'it' ? '🇮🇹 Italiano' : '🇬🇧 English'}
-            </span>
-            {/* pill IT / EN */}
-            <div style={{ display: 'flex', borderRadius: 999, overflow: 'hidden', background: 'var(--bg)', boxShadow: neu.inset }}>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{language === 'it' ? '🇮🇹 Italiano' : '🇬🇧 English'}</span>
+            <div style={{ display: 'flex', borderRadius: 999, overflow: 'hidden', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', boxShadow: neu.inset }}>
               {(['it', 'en'] as const).map(l => (
-                <button key={l} onClick={() => setLanguage(l)} style={{ width: 32, height: 26, border: 'none', borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', cursor: 'pointer', background: language === l ? 'var(--bg)' : 'transparent', color: language === l ? 'var(--accent)' : 'var(--text-muted)', boxShadow: language === l ? neu.outset : 'none', transition: 'box-shadow 0.2s, color 0.2s' }}>
+                <button key={l} onClick={() => setLanguage(l)}
+                  style={{ width: 32, height: 26, border: 'none', borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', cursor: 'pointer', background: language === l ? 'rgba(255,255,255,0.14)' : 'transparent', color: language === l ? 'var(--accent)' : 'var(--text-muted)', boxShadow: language === l ? neu.outset : 'none', transition: 'box-shadow 0.2s, color 0.2s, background 0.2s' }}>
                   {l.toUpperCase()}
                 </button>
               ))}
@@ -224,12 +241,13 @@ export function Impostazioni() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
             { key: 'email', label: 'Notifiche Email', desc: 'Ricevi aggiornamenti via email' },
-            { key: 'sms', label: 'Notifiche SMS', desc: 'Ricevi avvisi importanti via SMS' },
-            { key: 'push', label: 'Notifiche Push', desc: 'Avvisi in tempo reale sul browser' },
+            { key: 'sms',   label: 'Notifiche SMS',   desc: 'Ricevi avvisi importanti via SMS' },
+            { key: 'push',  label: 'Notifiche Push',  desc: 'Avvisi in tempo reale sul browser' },
             { key: 'newsletter', label: 'Newsletter', desc: 'Newsletter settimanale' },
           ].map(n => (
-            <div key={n.key} onClick={() => setNotifications(s => ({ ...s, [n.key]: !s[n.key as keyof typeof s] }))} style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', cursor: 'pointer', boxShadow: neu.insetSm }}>
-              <NeuCheck checked={notifications[n.key as keyof typeof notifications]} onChange={() => {}} />
+            <div key={n.key} onClick={() => setNotifications(s => ({ ...s, [n.key]: !s[n.key as keyof typeof s] }))}
+              style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 14, padding: '14px 18px', cursor: 'pointer', boxShadow: neu.insetSm }}>
+              <GlassCheck checked={notifications[n.key as keyof typeof notifications]} onChange={() => {}} />
               <div>
                 <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{n.label}</p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{n.desc}</p>
@@ -243,12 +261,13 @@ export function Impostazioni() {
       <Section icon={Shield} title="PRIVACY & VISIBILITÀ">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
-            { key: 'profileVisible', label: 'Profilo Pubblico', desc: 'Il tuo profilo è visibile agli altri' },
-            { key: 'activityVisible', label: 'Attività Visibile', desc: 'Mostra la tua attività recente' },
-            { key: 'emailPublic', label: 'Email Pubblica', desc: 'Condividi la tua email con altri' },
+            { key: 'profileVisible',  label: 'Profilo Pubblico',   desc: 'Il tuo profilo è visibile agli altri' },
+            { key: 'activityVisible', label: 'Attività Visibile',  desc: 'Mostra la tua attività recente' },
+            { key: 'emailPublic',     label: 'Email Pubblica',     desc: 'Condividi la tua email con altri' },
           ].map(p => (
-            <div key={p.key} onClick={() => setPrivacy(s => ({ ...s, [p.key]: !s[p.key as keyof typeof s] }))} style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', cursor: 'pointer', boxShadow: neu.insetSm }}>
-              <NeuCheck checked={privacy[p.key as keyof typeof privacy]} onChange={() => {}} />
+            <div key={p.key} onClick={() => setPrivacy(s => ({ ...s, [p.key]: !s[p.key as keyof typeof s] }))}
+              style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 14, padding: '14px 18px', cursor: 'pointer', boxShadow: neu.insetSm }}>
+              <GlassCheck checked={privacy[p.key as keyof typeof privacy]} onChange={() => {}} />
               <div>
                 <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{p.label}</p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.desc}</p>
@@ -262,14 +281,14 @@ export function Impostazioni() {
       <Section icon={Shield} title="SESSIONI ATTIVE">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 18 }}>
           {sessions.map(s => (
-            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', borderRadius: 14, padding: '14px 18px', boxShadow: neu.insetSm }}>
+            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 14, padding: '14px 18px', boxShadow: neu.insetSm }}>
               <div>
                 <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{s.device}</p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.browser} · {s.location}</p>
                 <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Ultimo accesso: {s.lastActive}</p>
               </div>
               {s.current && (
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '4px 12px', borderRadius: 999, background: 'var(--bg)', boxShadow: neu.outset, color: '#10b981' }}>ATTIVA</span>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '4px 12px', borderRadius: 999, background: 'rgba(16,185,129,0.10)', border: '1px solid rgba(16,185,129,0.22)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', color: '#10b981' }}>ATTIVA</span>
               )}
             </div>
           ))}
@@ -278,9 +297,9 @@ export function Impostazioni() {
       </Section>
 
       {/* Logout */}
-      <div style={{ ...glass, borderRadius: 24, padding: '26px', boxShadow: neu.panel, border: '1px solid rgba(239,68,68,0.25)' }}>
+      <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.20)', backdropFilter: 'blur(24px) saturate(1.5)', WebkitBackdropFilter: 'blur(24px) saturate(1.5)', borderRadius: 24, padding: 26, boxShadow: neu.panel }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--bg)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+          <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', boxShadow: neu.outset, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
             <LogOut size={15} />
           </div>
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.18em', color: '#ef4444' }}>LOGOUT</span>

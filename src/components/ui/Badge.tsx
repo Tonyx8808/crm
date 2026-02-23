@@ -16,10 +16,11 @@ const variantColor: Record<string, string> = {
 interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'primary' | 'success' | 'warning' | 'danger' | 'secondary'
   children: React.ReactNode
-  raised?: boolean  // outset (default) o inset
+  raised?: boolean
 }
 
 export function Badge({ variant = 'primary', raised = false, children, style, ...props }: BadgeProps) {
+  const color = variantColor[variant] ?? 'var(--text)'
   return (
     <div
       style={{
@@ -30,8 +31,12 @@ export function Badge({ variant = 'primary', raised = false, children, style, ..
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.14em',
-        background: 'var(--bg)',
-        color: variantColor[variant] ?? 'var(--text)',
+        /* glass */
+        background: `color-mix(in srgb, ${color} 10%, transparent)`,
+        border: `1px solid color-mix(in srgb, ${color} 28%, transparent)`,
+        backdropFilter: 'blur(12px) saturate(1.4)',
+        WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
+        color,
         boxShadow: raised ? neu.outset : neu.insetSm,
         transition: 'box-shadow 0.2s',
         ...style,

@@ -7,15 +7,15 @@ const neu = {
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
-  glass?: boolean   // frost glass (default) o neumorfico piatto
+  glass?: boolean
 }
 
 export function Card({ glass = true, children, style, ...props }: CardProps) {
   const glassStyle: React.CSSProperties = glass ? {
-    background: 'var(--glass-bg)',
-    border: '1px solid var(--glass-border)',
-    backdropFilter: 'blur(24px) saturate(1.5)',
-    WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.13)',
+    backdropFilter: 'blur(28px) saturate(1.6)',
+    WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
     boxShadow: neu.panel,
   } : {
     background: 'var(--bg)',
